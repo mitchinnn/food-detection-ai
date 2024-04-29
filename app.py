@@ -14,8 +14,19 @@ def home():
 @app.route('/predict', methods=['POST'])
 def predict():
     model = keras.models.load_model("final-food-model.h5")
-    specific_classes = ['baby_back_ribs', 'baklava', 'beef_carpaccio', 'bruschetta',
-                        'beet_salad', 'beignets', 'breakfast_burrito', 'donat', 'churros', 'fried_rice']
+
+    specific_classes = [
+        'baby_back_ribs', 
+        'baklava', 
+        'beef_carpaccio', 
+        'bruschetta',
+        'beet_salad', 
+        'beignets', 
+        'breakfast_burrito', 
+        'donat', 
+        'churros', 
+        'fried_rice'
+        ]
 
     if 'file' not in request.files:
         return jsonify({'error': 'Berkas tidak ditemukan'}), 400
