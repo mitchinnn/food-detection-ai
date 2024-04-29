@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result</title>
+</head>
+<body>
+    <h1>Predicted Class: <span id="predicted_class"></span></h1>
+
+    <script>
+        const predictedClass = document.getElementById('predicted_class');
+        // Fetch the predicted class from the server and update the HTML
+        fetch('/predict', {
+            method: 'POST',
+            body: new FormData()
+        })
+        .then(response => response.json())
+        .then(data => {
+            predictedClass.textContent = data.predicted_class;
+        })
+        .catch(error => console.error('Error:', error));
+    </script>
+</body>
+</html>

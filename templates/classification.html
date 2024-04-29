@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Detection Artificiall Intelligence</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            height: 100vh; /* Set body height to 100% of viewport height */
+            margin: 0; /* Remove default body margins */
+            padding: 0; /* Remove default body padding */
+            background-image: url('https://i.itworldcanada.com/wp-content/uploads/2023/08/GettyImages-1448152453-696x391.jpg'); /* Image of a neural network */
+            background-size: cover; /* Cover the entire background area */
+            background-position: center; /* Center the image within the background */
+            display: block; 
+            color: #ffffff;
+        }
+        #upload-form {
+            margin-top: 50px;
+        }
+        #image-container {
+            margin-top: 20px;
+        }
+        #predicted_class {
+            margin-top: 20px;
+            display: none; /* Sembunyikan hasil prediksi secara awal */
+        }
+        .loading {
+            display: none; /* Sembunyikan animasi loading secara awal */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            
+            <div class="col-md-6 offset-md-3">
+                <h1 class="text-center mb-5 pt-2">Food Detection</h1>
+                <form id="upload-form">
+                    <div class="custom-file mb-3">
+                        <input type="file" class="custom-file-input" id="file-input" accept="image/*">
+                        <label class="custom-file-label" for="file-input">Choose file</label>
+                    </div>
+                </form>
+                <div id="image-container" class="text-center"></div>
+                <h2 id="predicted_class" class="text-center"></h2>
+                <div class="loading text-center mt-3">
+                    <div class="spinner-border text-light" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.8.5/dist/tf.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#file-input').change(function() {
+                var file = $(this)[0].files[0];
+                var formData = new FormData();
+                formData.append('file', file);
+
+                $('#predicted_class').hide();
+                $('.loading').show();
+
+                var reader = new FileReader();
+                reader.onload = function(event) {
+                    $('#image-container').html('<img src="' + event.target.result + '" class="img-fluid">');
+                };
+                reader.readAsDataURL(file);
+
+                setTimeout(function() {
+                    fetch('/predict', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            $('#predicted_class').text(data.error).show();
+                        } else {
+                            var predictedClass = "Predicted Class: ";
+                            switch(data.predicted_class) {
+                                case 'baby_back_ribs':
+                                    predictedClass += "Baby Back Ribs - A type of barbecue ribs made from pork.";
+                                    break;
+                                case 'baklava':
+                                    predictedClass += "Baklava - A rich, sweet dessert pastry made of layers of filo filled with chopped nuts and sweetened with syrup or honey.";
+                                    break;
+                                case 'beef_carpaccio':
+                                    predictedClass += "Beef Carpaccio - An Italian appetizer consisting of thinly sliced raw beef or fish, typically served as an hors d'oeuvre.";
+                                    break;
+                                case 'bruschetta':
+                                    predictedClass += "Bruschetta - An Italian antipasto consisting of grilled bread rubbed with garlic and topped with olive oil and salt.";
+                                    break;
+                                case 'beet_salad':
+                                    predictedClass += "Beet Salad - A salad made from beets, often combined with other ingredients such as goat cheese and nuts.";
+                                    break;
+                                case 'beignets':
+                                    predictedClass += "Beignets - A French pastry made from deep-fried choux dough, typically dusted with powdered sugar.";
+                                    break;
+                                case 'breakfast_burrito':
+                                    predictedClass += "Breakfast Burrito - A type of burrito filled with ingredients typically eaten at breakfast, such as eggs, cheese, and meat.";
+                                    break;
+                                case 'donat':
+                                    predictedClass += "Donut - A small fried cake of sweetened dough, typically in the shape of a ring.";
+                                    break;
+                                case 'churros':
+                                    predictedClass += "Churros - A fried-dough pastry snack originating from Spain, often eaten dipped in chocolate sauce.";
+                                    break;
+                                case 'fried_rice':
+                                    predictedClass += "Fried Rice - A dish of cooked rice that has been stir-fried in a wok or frying pan, often mixed with other ingredients such as vegetables and eggs.";
+                                    break;
+                                default:
+                                    predictedClass += data.predicted_class;
+                            }
+                            $('#predicted_class').text(predictedClass).show();
+                        }
+                        $('.loading').hide();
+                    })
+                    .catch(error => console.error('Error:', error));
+                }, 2000); // Delay for 2 seconds before displaying prediction result
+            });
+        });
+    </script>
+</body>
+</html>
